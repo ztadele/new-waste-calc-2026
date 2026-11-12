@@ -2,6 +2,17 @@ from drafter import *
 from dataclasses import dataclass
 from bakery import assert_equal
 
+set_website_title("Corgi Cafe")
+set_site_information(
+    author="Your Name",
+    description="Order snacks for very good dogs.",
+    sources="Thanks to the Drafter docs and my study group.",
+    planning=["plan.pdf", "design.pdf"],
+    links=["https://github.com/your-username/your-repository"]
+)
+hide_debug_information()
+set_website_framed(False)
+
 
 
 @dataclass
@@ -443,16 +454,6 @@ class TestWasteCalculator(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
-set_website_title("Corgi Cafe")
-set_site_information(
-    author="Your Name",
-    description="Order snacks for very good dogs.",
-    sources="Thanks to the Drafter docs and my study group.",
-    planning=["plan.pdf", "design.pdf"],
-    links=["https://github.com/your-username/your-repository"]
-)
-hide_debug_information()
-set_website_framed(False)
 
 start_server(create_initial_state())
 
