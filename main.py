@@ -2,13 +2,16 @@ from drafter import *
 from dataclasses import dataclass
 from bakery import assert_equal
 
-set_website_title("Corgi Cafe")
+set_website_title("Waste Calculator")
 set_site_information(
-    author="Your Name",
-    description="Order snacks for very good dogs.",
-    sources="Thanks to the Drafter docs and my study group.",
+    author="Zoe Tadele"
+    description="Waste calculator that takes inb waste values for an area and returns a grade for that area.",
+    sources="Thanks to the Drafter docs and my LLMs.",
     planning=["plan.pdf", "design.pdf"],
-    links=["https://github.com/ztadele/new-waste-calc-2026"]
+    links=["https://github.com/ztadele/new-waste-calc-2026", 
+           "https://docs.google.com/document/d/11vAyJCyHmUyOwMJvHo3WGte7SLyJFd03FnJKTQXB5ms/edit?usp=sharing",
+           "https://docs.google.com/document/d/1CNqmLDPh3cgLxsoYa_QDdR5wQlm9tF97VsUNM5Dj8GU/edit?usp=sharing",
+          "https://docs.google.com/document/d/1DzrbelletEesy8-ZcCAqgYb1OftCqaC52mWdr1g0kiM/edit?usp=sharing"]
 )
 hide_debug_information()
 set_website_framed(False)
