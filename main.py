@@ -274,5 +274,135 @@ def restart_calc(state: State) -> Page:
         Button("Return to Start", "index")
     ])
 
+# ---------------------------------------------------------------------------
+# Unit tests (bakery). Test values are built inside helper functions so the
+# file has no global variables.
+# ---------------------------------------------------------------------------
+
+def make_state(area: str = "", waste_amount: int = 0, waste_type: str = "",
+               total_waste: int = 0, grade: str = "") -> State:
+    """Build a fresh State with the given fields filled in for a test."""
+    state = create_initial_state()
+    state.area = area
+    state.waste_amount = waste_amount
+    state.waste_type = waste_type
+    state.total_waste = total_waste
+    state.grade = grade
+    return state
+
+
+def make_state_with_two_entries() -> State:
+    """Build a State that has saved two waste entries (10 lbs and 5 lbs)."""
+    state = make_state("Kitchen", 10, "Plastic")
+    save_waste_entry(state)
+    state.area = "Bedroom"
+    state.waste_type = "Paper"
+    state.waste_amount = 5
+    return save_waste_entry(state)
+
+
+# --- create_initial_state ---
+assert_equal(create_initial_state().area, "")
+assert_equal(create_initial_state().waste_list, [])
+assert_equal(create_initial_state().waste_type, "")
+assert_equal(create_initial_state().waste_amount, 0)
+assert_equal(create_initial_state().total_waste, 0)
+assert_equal(create_initial_state().grade, "")
+assert_equal(len(create_initial_state().waste_categories), 5)
+assert_equal(create_initial_state().waste_categories[0].waste_category_name,
+             "Plastic")
+assert_equal(create_initial_state().waste_categories[4].is_recyclable, False)
+
+# --- can_recycle ---
+assert_equal(can_recycle("plastic"), True)
+assert_equal(can_recycle("Paper"), True)      # capitalization is ignored
+assert_equal(can_recycle("GLASS"), True)
+assert_equal(can_recycle("metal"), True)
+assert_equal(can_recycle("other"), False)
+assert_equal(can_recycle("banana peel"), False)
+
+# --- waste_present ---
+assert_equal(waste_present(0), "No waste found, try again!")
+assert_equal(waste_present(1), "low waste count (less than 50 lbs)")
+assert_equal(waste_present(50), "low waste count (less than 50 lbs)")
+assert_equal(waste_present(51), "high waste amount (greater than 50 lbs)")
+assert_equal(waste_present(200), "high waste amount (greater than 50 lbs)")
+
+# --- save_waste_entry ---
+assert_equal(make_state_with_two_entries().total_waste, 15)
+assert_equal(len(make_state_with_two_entries().waste_list), 2)
+assert_equal(make_state_with_two_entries().waste_list[0],
+             Waste("Kitchen", "Plastic", 10))
+assert_equal(make_state_with_two_entries().waste_list[1],
+             Waste("Bedroom", "Paper", 5))
+
+# --- index route ---
+assert_equal(index(make_state()).state, make_state())
+assert_equal(len(index(make_state()).content), 4)
+
+# --- add_waste route ---
+assert_equal(add_waste(make_state("Kitchen", 5)).state.area, "Kitchen")
+assert_equal(len(add_waste(make_state()).content), 8)
+
+# --- waste_categories route (saves area and amount) ---
+assert_equal(waste_categories(make_state(), "Kitchen", 15).state.area,
+             "Kitchen")
+assert_equal(waste_categories(make_state(), "Kitchen", 15).state.waste_amount,
+             15)
+assert_equal(len(waste_categories(make_state(), "Kitchen", 15).content), 10)
+
+# --- view_waste route (valid input) ---
+assert_equal(view_waste(make_state("Kitchen", 15), "Plastic").state.waste_type,
+             "Plastic")
+assert_equal(view_waste(make_state("Kitchen", 15), "Plastic").state.total_waste,
+             15)
+assert_equal(len(view_waste(make_state("Kitchen", 15),
+                            "Plastic").state.waste_list), 1)
+assert_equal(len(view_waste(make_state("Kitchen", 15), "Plastic").content), 5)
+
+# --- view_waste route (invalid input: blank area, then zero amount) ---
+assert_equal(len(view_waste(make_state("", 15), "Plastic").content), 3)
+assert_equal(view_waste(make_state("", 15), "Plastic").state.waste_list, [])
+assert_equal(len(view_waste(make_state("Kitchen", 0), "Plastic").content), 3)
+assert_equal(view_waste(make_state("Kitchen", 0),
+                        "Plastic").state.total_waste, 0)
+
+# --- return_grade route (every boundary) ---
+assert_equal(return_grade(make_state(total_waste=5)).state.grade, "A")
+assert_equal(return_grade(make_state(total_waste=10)).state.grade, "A")
+assert_equal(return_grade(make_state(total_waste=11)).state.grade, "B")
+assert_equal(return_grade(make_state(total_waste=25)).state.grade, "B")
+assert_equal(return_grade(make_state(total_waste=26)).state.grade, "C")
+assert_equal(return_grade(make_state(total_waste=50)).state.grade, "C")
+assert_equal(return_grade(make_state(total_waste=51)).state.grade, "D")
+assert_equal(len(return_grade(make_state(total_waste=5)).content), 4)
+
+# --- view_grade route ---
+assert_equal(view_grade(make_state(grade="A")).state.grade, "A")
+assert_equal(view_grade(make_state(grade="D")).state.grade, "D")
+assert_equal(len(view_grade(make_state(grade="B")).content), 5)
+
+# --- view_advice route ---
+assert_equal(view_advice(make_state(grade="A", waste_type="Glass",
+                                    total_waste=5)).state.grade, "A")
+assert_equal(view_advice(make_state(grade="B", waste_type="Plastic",
+                                    total_waste=20)).state.total_waste, 20)
+assert_equal(len(view_advice(make_state(grade="D", waste_type="Other",
+                                        total_waste=60)).content), 6)
+
+# --- restart_calc route (every field is reset) ---
+assert_equal(restart_calc(make_state_with_two_entries()).state.waste_list, [])
+assert_equal(restart_calc(make_state_with_two_entries()).state.total_waste, 0)
+assert_equal(restart_calc(make_state("Kitchen", 20, "Plastic", 20, "B")
+                          ).state.area, "")
+assert_equal(restart_calc(make_state("Kitchen", 20, "Plastic", 20, "B")
+                          ).state.waste_type, "")
+assert_equal(restart_calc(make_state("Kitchen", 20, "Plastic", 20, "B")
+                          ).state.waste_amount, 0)
+assert_equal(restart_calc(make_state("Kitchen", 20, "Plastic", 20, "B")
+                          ).state.grade, "")
+assert_equal(len(restart_calc(make_state()).content), 4)
+
+
 if __name__ == "__main__":
     start_server(create_initial_state())
