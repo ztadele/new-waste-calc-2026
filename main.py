@@ -8,7 +8,7 @@ set_site_information(
     description="Order snacks for very good dogs.",
     sources="Thanks to the Drafter docs and my study group.",
     planning=["plan.pdf", "design.pdf"],
-    links=["https://github.com/your-username/your-repository"]
+    links=["https://github.com/ztadele/new-waste-calc-2026"]
 )
 hide_debug_information()
 set_website_framed(False)
