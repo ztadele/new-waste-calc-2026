@@ -4,7 +4,7 @@ from bakery import assert_equal
 
 set_website_title("Waste Calculator")
 set_site_information(
-    author="Zoe Tadele"
+    author="Zoe Tadele",
     description="Waste calculator that takes inb waste values for an area and returns a grade for that area.",
     sources="Thanks to the Drafter docs and my LLMs.",
     planning=["plan.pdf", "design.pdf"],
